@@ -1,0 +1,5 @@
+Edge IntelliShield Fraud Detection Project
+Total Transactions: 5
+Fraud Transactions: 2
+Normal Transactions: 3
+Prediction Result: Fraud Detected
