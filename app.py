@@ -1,13 +1,21 @@
 from flask import Flask, render_template, request
 import numpy as np
 import pickle
+from pymongo import MongoClient
+from datetime import datetime
 
 app = Flask(__name__)
 
-# Load trained model
+# MongoDB Connection
+client = MongoClient("mongodb://admin:password@mongodb:27017/")
+
+db = client["fraud_detection"]
+
+collection = db["predictions"]
+
+# Load Model
 model = pickle.load(open("models/fraud_model.pkl", "rb"))
 
-# Load label encoder
 encoder = pickle.load(open("models/label_encoder.pkl", "rb"))
 
 @app.route("/")
@@ -36,7 +44,6 @@ def predict():
     # Encode type
     type_encoded = encoder.transform([transaction_type])[0]
 
-    # Prepare features
     features = np.array([[
         step,
         type_encoded,
@@ -48,7 +55,6 @@ def predict():
         isFlaggedFraud
     ]])
 
-    # Prediction
     prediction = model.predict(features)
 
     if prediction[0] == 1:
@@ -56,10 +62,37 @@ def predict():
     else:
         result = "Safe Transaction"
 
+    # Store in MongoDB
+    data = {
+
+        "step": step,
+
+        "transaction_type": transaction_type,
+
+        "amount": amount,
+
+        "oldbalanceOrg": oldbalanceOrg,
+
+        "newbalanceOrig": newbalanceOrig,
+
+        "oldbalanceDest": oldbalanceDest,
+
+        "newbalanceDest": newbalanceDest,
+
+        "isFlaggedFraud": isFlaggedFraud,
+
+        "prediction": result,
+
+        "timestamp": datetime.now()
+
+    }
+
+    collection.insert_one(data)
+
     return render_template(
         "index.html",
         prediction_text=result
     )
 
 if __name__ == "__main__":
-    app.run(debug=True, port=4040)
+    app.run(host="0.0.0.0", debug=True, port=5000)
