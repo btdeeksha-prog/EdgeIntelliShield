@@ -1,45 +1,57 @@
 import pandas as pd
+import pickle
+
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
-import pickle
+from sklearn.metrics import accuracy_score
 
 # Load dataset
-df = pd.read_csv("fraud.csv")
+df = pd.read_csv("dataset/fraud.csv")
+
+# Remove unnecessary columns
+df = df.drop(["nameOrig", "nameDest"], axis=1)
 
 # Encode transaction type
-le = LabelEncoder()
-df["type"] = le.fit_transform(df["type"])
+encoder = LabelEncoder()
+
+df["type"] = encoder.fit_transform(df["type"])
 
 # Features
-X = df[[
-    "step",
-    "type",
-    "amount",
-    "oldbalanceOrg",
-    "newbalanceOrig",
-    "oldbalanceDest",
-    "newbalanceDest"
-]]
+X = df.drop("isFraud", axis=1)
 
 # Target
 y = df["isFraud"]
 
-# Train Test Split
+# Split dataset
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
 )
 
-# Model
-model = RandomForestClassifier(n_estimators=50)
+# Create model
+model = RandomForestClassifier(
+    n_estimators=50,
+    random_state=42
+)
 
-# Train
+# Train model
 model.fit(X_train, y_train)
 
+# Prediction
+y_pred = model.predict(X_test)
+
+# Accuracy
+accuracy = accuracy_score(y_test, y_pred)
+
+print("Model Accuracy:", accuracy)
+
 # Save model
-pickle.dump(model, open("fraud_model.pkl", "wb"))
+pickle.dump(model, open("models/fraud_model.pkl", "wb"))
 
 # Save encoder
-pickle.dump(le, open("label_encoder.pkl", "wb"))
+pickle.dump(encoder, open("models/label_encoder.pkl", "wb"))
 
-print("Model Trained Successfully")
+print("Pickle files saved successfully")

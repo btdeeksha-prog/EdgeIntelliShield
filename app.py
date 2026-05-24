@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request
-import pickle
 import numpy as np
+import pickle
 
 app = Flask(__name__)
 
-# Load model and encoder
-model = pickle.load(open("fraud_model.pkl", "rb"))
-encoder = pickle.load(open("label_encoder.pkl", "rb"))
+# Load trained model
+model = pickle.load(open("models/fraud_model.pkl", "rb"))
+
+# Load label encoder
+encoder = pickle.load(open("models/label_encoder.pkl", "rb"))
 
 @app.route("/")
 def home():
@@ -16,20 +18,37 @@ def home():
 def predict():
 
     step = int(request.form["step"])
-    type_trans = request.form["type"]
+
+    transaction_type = request.form["type"]
+
     amount = float(request.form["amount"])
+
     oldbalanceOrg = float(request.form["oldbalanceOrg"])
+
     newbalanceOrig = float(request.form["newbalanceOrig"])
+
     oldbalanceDest = float(request.form["oldbalanceDest"])
+
     newbalanceDest = float(request.form["newbalanceDest"])
 
+    isFlaggedFraud = int(request.form["isFlaggedFraud"])
+
     # Encode type
-    type_encoded = encoder.transform([type_trans])[0]
+    type_encoded = encoder.transform([transaction_type])[0]
 
-    features = np.array([[step, type_encoded, amount,
-                          oldbalanceOrg, newbalanceOrig,
-                          oldbalanceDest, newbalanceDest]])
+    # Prepare features
+    features = np.array([[
+        step,
+        type_encoded,
+        amount,
+        oldbalanceOrg,
+        newbalanceOrig,
+        oldbalanceDest,
+        newbalanceDest,
+        isFlaggedFraud
+    ]])
 
+    # Prediction
     prediction = model.predict(features)
 
     if prediction[0] == 1:
@@ -37,7 +56,10 @@ def predict():
     else:
         result = "Safe Transaction"
 
-    return render_template("index.html", prediction=result)
+    return render_template(
+        "index.html",
+        prediction_text=result
+    )
 
 if __name__ == "__main__":
     app.run(debug=True, port=4040)

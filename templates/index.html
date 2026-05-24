@@ -1,43 +1,87 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Fraud Detection System</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <title>Edge IntelliShield</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
 </head>
+
 <body>
 
 <div class="container">
 
-    <h1>Online Fraud Detection</h1>
+    <h1>Edge IntelliShield</h1>
 
     <form action="/predict" method="POST">
 
-        <input type="number" name="step" placeholder="Step" required>
+        <input type="number"
+               name="step"
+               placeholder="Step"
+               required>
 
         <select name="type">
+
             <option value="PAYMENT">PAYMENT</option>
+
             <option value="TRANSFER">TRANSFER</option>
+
             <option value="CASH_OUT">CASH_OUT</option>
+
             <option value="DEBIT">DEBIT</option>
+
             <option value="CASH_IN">CASH_IN</option>
+
         </select>
 
-        <input type="number" step="any" name="amount" placeholder="Amount" required>
+        <input type="number"
+               step="any"
+               name="amount"
+               placeholder="Amount"
+               required>
 
-        <input type="number" step="any" name="oldbalanceOrg" placeholder="Old Balance Origin" required>
+        <input type="number"
+               step="any"
+               name="oldbalanceOrg"
+               placeholder="Old Balance Origin"
+               required>
 
-        <input type="number" step="any" name="newbalanceOrig" placeholder="New Balance Origin" required>
+        <input type="number"
+               step="any"
+               name="newbalanceOrig"
+               placeholder="New Balance Origin"
+               required>
 
-        <input type="number" step="any" name="oldbalanceDest" placeholder="Old Balance Destination" required>
+        <input type="number"
+               step="any"
+               name="oldbalanceDest"
+               placeholder="Old Balance Destination"
+               required>
 
-        <input type="number" step="any" name="newbalanceDest" placeholder="New Balance Destination" required>
+        <input type="number"
+               step="any"
+               name="newbalanceDest"
+               placeholder="New Balance Destination"
+               required>
 
-        <button type="submit">Predict Fraud</button>
+        <select name="isFlaggedFraud">
+
+            <option value="0">Not Flagged</option>
+
+            <option value="1">Flagged Fraud</option>
+
+        </select>
+
+        <button type="submit">
+            Predict Fraud
+        </button>
 
     </form>
 
-    {% if prediction %}
-        <h2>{{ prediction }}</h2>
+    {% if prediction_text %}
+        <h2>{{ prediction_text }}</h2>
     {% endif %}
 
 </div>

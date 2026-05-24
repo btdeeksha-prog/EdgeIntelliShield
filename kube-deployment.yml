@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: fraud-detection-app
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: fraud-app
+
+  template:
+    metadata:
+      labels:
+        app: fraud-app
+
+    spec:
+      containers:
+      - name: fraud-app
+        image: edge-intellishield:latest
+
+        ports:
+        - containerPort: 5000
