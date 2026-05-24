@@ -1,25 +1,45 @@
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
 import pickle
 
-# Sample dataset
-data = {
-    "amount": [100, 5000, 200, 7000, 300],
-    "location": [1, 0, 1, 0, 1],
-    "device": [1, 0, 1, 0, 1],
-    "fraud": [0, 1, 0, 1, 0]
-}
+# Load dataset
+df = pd.read_csv("fraud.csv")
 
-df = pd.DataFrame(data)
+# Encode transaction type
+le = LabelEncoder()
+df["type"] = le.fit_transform(df["type"])
 
-X = df[["amount", "location", "device"]]
-y = df["fraud"]
+# Features
+X = df[[
+    "step",
+    "type",
+    "amount",
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "oldbalanceDest",
+    "newbalanceDest"
+]]
 
-model = DecisionTreeClassifier()
-model.fit(X, y)
+# Target
+y = df["isFraud"]
+
+# Train Test Split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Model
+model = RandomForestClassifier(n_estimators=50)
+
+# Train
+model.fit(X_train, y_train)
 
 # Save model
-with open("fraud_model.pkl", "wb") as f:
-    pickle.dump(model, f)
+pickle.dump(model, open("fraud_model.pkl", "wb"))
 
-print("Model saved successfully")
+# Save encoder
+pickle.dump(le, open("label_encoder.pkl", "wb"))
+
+print("Model Trained Successfully")

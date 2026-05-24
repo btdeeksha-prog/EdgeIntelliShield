@@ -8,30 +8,37 @@
 
 <div class="container">
 
-    <h1>Fraud Detection System</h1>
+    <h1>Online Fraud Detection</h1>
 
     <form action="/predict" method="POST">
 
-        <label>Transaction Amount</label>
-        <input type="number" name="amount" required>
+        <input type="number" name="step" placeholder="Step" required>
 
-        <label>Location</label>
-        <select name="location">
-            <option value="1">Trusted</option>
-            <option value="0">Unknown</option>
+        <select name="type">
+            <option value="PAYMENT">PAYMENT</option>
+            <option value="TRANSFER">TRANSFER</option>
+            <option value="CASH_OUT">CASH_OUT</option>
+            <option value="DEBIT">DEBIT</option>
+            <option value="CASH_IN">CASH_IN</option>
         </select>
 
-        <label>Device</label>
-        <select name="device">
-            <option value="1">Trusted</option>
-            <option value="0">Unknown</option>
-        </select>
+        <input type="number" step="any" name="amount" placeholder="Amount" required>
 
-        <button type="submit">Check Fraud</button>
+        <input type="number" step="any" name="oldbalanceOrg" placeholder="Old Balance Origin" required>
+
+        <input type="number" step="any" name="newbalanceOrig" placeholder="New Balance Origin" required>
+
+        <input type="number" step="any" name="oldbalanceDest" placeholder="Old Balance Destination" required>
+
+        <input type="number" step="any" name="newbalanceDest" placeholder="New Balance Destination" required>
+
+        <button type="submit">Predict Fraud</button>
 
     </form>
 
-    <h2>{{ prediction_text }}</h2>
+    {% if prediction %}
+        <h2>{{ prediction }}</h2>
+    {% endif %}
 
 </div>
 

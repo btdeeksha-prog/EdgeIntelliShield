@@ -4,8 +4,9 @@ import numpy as np
 
 app = Flask(__name__)
 
-# Load model
+# Load model and encoder
 model = pickle.load(open("fraud_model.pkl", "rb"))
+encoder = pickle.load(open("label_encoder.pkl", "rb"))
 
 @app.route("/")
 def home():
@@ -14,11 +15,20 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
 
+    step = int(request.form["step"])
+    type_trans = request.form["type"]
     amount = float(request.form["amount"])
-    location = int(request.form["location"])
-    device = int(request.form["device"])
+    oldbalanceOrg = float(request.form["oldbalanceOrg"])
+    newbalanceOrig = float(request.form["newbalanceOrig"])
+    oldbalanceDest = float(request.form["oldbalanceDest"])
+    newbalanceDest = float(request.form["newbalanceDest"])
 
-    features = np.array([[amount, location, device]])
+    # Encode type
+    type_encoded = encoder.transform([type_trans])[0]
+
+    features = np.array([[step, type_encoded, amount,
+                          oldbalanceOrg, newbalanceOrig,
+                          oldbalanceDest, newbalanceDest]])
 
     prediction = model.predict(features)
 
@@ -27,7 +37,7 @@ def predict():
     else:
         result = "Safe Transaction"
 
-    return render_template("index.html", prediction_text=result)
+    return render_template("index.html", prediction=result)
 
 if __name__ == "__main__":
     app.run(debug=True, port=4040)
