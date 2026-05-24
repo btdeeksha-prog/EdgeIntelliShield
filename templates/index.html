@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fraud Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Fraud Detection System</h1>
+
+    <form action="/predict" method="POST">
+
+        <label>Transaction Amount</label>
+        <input type="number" name="amount" required>
+
+        <label>Location</label>
+        <select name="location">
+            <option value="1">Trusted</option>
+            <option value="0">Unknown</option>
+        </select>
+
+        <label>Device</label>
+        <select name="device">
+            <option value="1">Trusted</option>
+            <option value="0">Unknown</option>
+        </select>
+
+        <button type="submit">Check Fraud</button>
+
+    </form>
+
+    <h2>{{ prediction_text }}</h2>
+
+</div>
+
+</body>
+</html>
